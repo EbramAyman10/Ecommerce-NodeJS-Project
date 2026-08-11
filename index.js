@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.post(
-  "/webhook",
+  "/api/completed-checkout",
   express.raw({ type: "application/json" }),
   catchError((req, res) => {
     const signature = req.headers["stripe-signature"];
