@@ -2,6 +2,7 @@ import { Router } from "express";
 import express from "express";
 import { allowedTo, protectedRoutes } from "../auth/auth.controller.js";
 import {
+  createCardOrder,
   createCashOrder,
   createCheckoutSession,
   getAllOrders,
@@ -22,6 +23,6 @@ orderRouter
   .route("/checkout/:id")
   .post(protectedRoutes, allowedTo("user"), createCheckoutSession);
 
-orderRouter.post("/api/webhook", express.raw({ type: "application/json" }));
+orderRouter.post("/api/webhook", express.raw({ type: "application/json" }),createCardOrder);
 
 export default orderRouter;
