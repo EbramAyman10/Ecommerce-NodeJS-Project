@@ -6,6 +6,9 @@ import { globalError } from "./src/middleware/globalError.js";
 import { AppError } from "./src/utils/appError.js";
 import { bootstrap } from "./src/modules/bootstrap.routes.js";
 import catchError from "./src/middleware/catchError.js";
+import Stripe from "stripe";
+const stripeClient = new Stripe(process.env.STRIPE_KEY);
+
 const app = express();
 const port = process.env.PORT || 3000;
 
