@@ -17,7 +17,7 @@ app.post(
   express.raw({ type: "application/json" }),
   catchError((req, res) => {
     const signature = req.headers["stripe-signature"];
-    let event = stripe.webhooks.constructEvent(
+    let event = stripeClient.webhooks.constructEvent(
       req.body,
       signature,
       "whsec_0MBVjEv0jqfjm4sadSag7JREecJd6R3y",
