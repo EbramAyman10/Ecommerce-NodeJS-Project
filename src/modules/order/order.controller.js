@@ -58,7 +58,7 @@ const createCheckoutSession = catchError(async (req, res, next) => {
       {
         price_data: {
           currency: "egp",
-          unit_amount: totalOrderPrice,
+          unit_amount: totalOrderPrice * 100,
           product_data: {
             name: req.user.name,
           },
