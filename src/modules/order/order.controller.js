@@ -1,6 +1,7 @@
 import Cart from "../../../database/models/cart.model.js";
 import Order from "../../../database/models/order.model.js";
 import Product from "../../../database/models/product.model.js";
+import User from "../../../database/models/users.model.js";
 import catchError from "../../middleware/catchError.js";
 import { AppError } from "../../utils/appError.js";
 
@@ -76,4 +77,52 @@ const createCheckoutSession = catchError(async (req, res, next) => {
   res.json({ message: "Success", session });
 });
 
-export { createCashOrder, getUserOrders, getAllOrders, createCheckoutSession };
+const createCardOrder = catchError(async (req, res, next) => {
+  const signature = req.headers["stripe-signature"];
+  let event = stripeClient.webhooks.constructEvent(
+    req.body,
+    signature,
+    process.env.STRIPE_WEBHOOK_SIGNING,
+  );
+
+  let checkout;
+  if (event.type === "checkout.session.completed") {
+    checkout = event.data.object;
+    let user = await User.findOne({ email: checkout.customer_email });
+    if (!user) return next(new AppError("user not found", 404));
+    let cart = await Cart.findById(checkout.client_reference_id);
+    if (!cart) return next(new AppError("cart not found", 404));
+
+    let order = new Order({
+      user: user._id,
+      orderItems: cart.cartItems,
+      shippingAddress: checkout.metadata,
+      totalOrderPrice: checkout.amount_total / 100,
+      paymentType: "card",
+      isPaid: true,
+    });
+    await order.save();
+
+    let options = cart.cartItems.map((prod) => {
+      return {
+        updateOne: {
+          filter: { _id: prod.product },
+          update: { $inc: { sold: prod.quantity, stock: -prod.quantity } },
+        },
+      };
+    });
+
+    await Product.bulkWrite(options);
+
+    await Cart.findByIdAndDelete(cart._id);
+  }
+  res.json({ message: "success", checkout });
+});
+
+export {
+  createCashOrder,
+  getUserOrders,
+  getAllOrders,
+  createCheckoutSession,
+  createCardOrder,
+};

@@ -22,4 +22,6 @@ orderRouter
   .route("/checkout/:id")
   .post(protectedRoutes, allowedTo("user"), createCheckoutSession);
 
+orderRouter.post("/api/webhook", express.raw({ type: "application/json" }));
+
 export default orderRouter;
