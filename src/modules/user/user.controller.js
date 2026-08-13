@@ -6,6 +6,7 @@ import User from "../../../database/models/users.model.js";
 const addUser = catchError(async (req, res) => {
   let user = new User(req.body);
   await user.save();
+  user.password = undefined;
   res.status(201).json({ message: "Success", user });
 });
 

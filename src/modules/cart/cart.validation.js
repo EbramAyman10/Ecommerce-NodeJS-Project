@@ -6,6 +6,7 @@ const addCartValidation = joi.object({
 });
 const updateCartValidation = joi.object({
   quantity: joi.number().min(0).required(),
+  id: joi.string().hex().length(24),
 });
 
 export { addCartValidation, updateCartValidation };

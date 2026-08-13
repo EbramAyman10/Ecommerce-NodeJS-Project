@@ -25,6 +25,8 @@ const addProductValidation = joi.object({
     .required(),
   price: joi.number().min(0).required(),
   stock: joi.number().min(0).required(),
+  category: joi.string().hex().length(24).required(),
+  subCategory: joi.string().hex().length(24).required(),
 });
 
 export { addProductValidation };

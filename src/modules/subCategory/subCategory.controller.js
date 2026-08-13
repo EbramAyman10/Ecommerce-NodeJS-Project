@@ -6,7 +6,7 @@ import { deleteOne, getOne } from "../../handlers/handlers.js";
 import { ApiFeatures } from "../../utils/apiFeatures.js";
 
 const addSubCategory = catchError(async (req, res) => {
-  req.body.slug = slugify(req.body.name);
+  req.body.slug = slugify(req.body.title);
   let subCategory = new SubCategory(req.body);
   await subCategory.save();
   res.status(201).json({ message: "Success", subCategory });
@@ -29,7 +29,7 @@ const getAllSubCategories = catchError(async (req, res) => {
 const getSubCategory = getOne(SubCategory);
 
 const updateSubCategory = catchError(async (req, res, next) => {
-  req.body.slug = slugify(req.body.name);
+  req.body.slug = slugify(req.body.title);
   let subcategory = await SubCategory.findByIdAndUpdate(
     req.params.id,
     req.body,

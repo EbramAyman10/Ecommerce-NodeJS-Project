@@ -19,6 +19,10 @@ const getAll = (model) => {
       .sort()
       .search();
     let document = await apiFeatures.mongooseQuery;
+    if (document[0].password)
+      document.forEach((doc) => {
+        doc.password = undefined;
+      });
     res.json({ message: "Success", page: apiFeatures.pageNumber, document });
   });
 };
@@ -27,6 +31,7 @@ const getOne = (model) => {
   return catchError(async (req, res, next) => {
     let document = await model.findById(req.params.id);
     if (!document) return next(new AppError("document not found", 404));
+    if (document.password) document.password = undefined;
     res.json({ message: "Success", document });
   });
 };

@@ -20,15 +20,15 @@ const getAllProducts = getAll(Product);
 const getProduct = getOne(Product);
 
 const updateProduct = catchError(async (req, res, next) => {
-  if (req.body.slug) req.body.slug = slugify(req.body.name);
+  if (req.body.title) req.body.slug = slugify(req.body.title);
 
   let product = await Product.findById(req.params.id);
   if (!product) return next(new AppError("product not found", 404));
   if (req.files.images && product.images) {
     deleteFiles("products", product.images);
+    product.imageCover = req.files.images[0].filename;
+    product.images = req.files.images.map((image) => image.filename);
   }
-  product.imageCover = req.files.images[0].filename;
-  product.images = req.files.images.map((image) => image.filename);
 
   await product.save();
   res.json({ message: "Success", product });

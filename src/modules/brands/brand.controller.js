@@ -5,7 +5,7 @@ import Brand from "../../../database/models/brand.model.js";
 import { deleteOne, getAll, getOne } from "../../handlers/handlers.js";
 
 const addBrand = catchError(async (req, res) => {
-  req.body.slug = slugify(req.body.name);
+  req.body.slug = slugify(req.body.title);
   req.body.logo = req.file.logo;
   let brand = new Brand(req.body);
   await brand.save();
@@ -17,8 +17,8 @@ const getAllBrands = getAll(Brand);
 const getBrand = getOne(Brand);
 
 const updateBrand = catchError(async (req, res, next) => {
-  req.body.slug = slugify(req.body.name);
-  req.body.logo = req.file.logo;
+  if (req.body.title) req.body.slug = slugify(req.body.title);
+  if (req.body.logo) req.body.logo = req.file.logo;
 
   let brand = await Brand.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
