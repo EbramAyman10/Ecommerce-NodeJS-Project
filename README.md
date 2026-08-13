@@ -180,7 +180,7 @@ The API uses **JWT** to authenticate users.
 Protected endpoints require a valid token in the request headers:
 
 ```text
-Authorization: Bearer <token>
+token:  <token>
 ```
 
 Authorization is handled separately from authentication:
@@ -319,7 +319,7 @@ The documentation contains the available endpoints, HTTP methods, request parame
 
 ### 📮 Postman Documentation
 
-**[View API Documentation](YOUR_POSTMAN_DOCUMENTATION_LINK)**
+**[View API Documentation](https://documenter.getpostman.com/view/50077115/2sBYApxsKv)**
 
 ---
 
@@ -378,11 +378,11 @@ The backend is deployed using **Vercel** and the production database is hosted o
 
 ### Live API
 
-**[Open Live API](YOUR_VERCEL_URL)**
+**[Open Live API](https://ecommerce-node-js-project.vercel.app/api)**
 
 ### API Documentation
 
-**[Open Postman Documentation](YOUR_POSTMAN_DOCUMENTATION_LINK)**
+**[Open Postman Documentation](https://documenter.getpostman.com/view/50077115/2sBYApxsKv)**
 
 ---
 
