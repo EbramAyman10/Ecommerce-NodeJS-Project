@@ -9,6 +9,8 @@ import {
   removeFromCart,
   updateQuantity,
 } from "./cart.controller.js";
+import { validate } from "../../middleware/validate.js";
+import { addCartValidation, updateCartValidation } from "./cart.validation.js";
 
 const cartRouter = Router();
 
@@ -16,9 +18,12 @@ cartRouter.use(protectedRoutes, allowedTo("user"));
 
 cartRouter
   .route("/")
-  .post(addToCart)
+  .post(validate(addCartValidation), addToCart)
   .get(getLoggedUserCart)
   .delete(clearUserCart);
-cartRouter.route("/:id").put(updateQuantity).delete(removeFromCart);
+cartRouter
+  .route("/:id")
+  .put(validate(updateCartValidation), updateQuantity)
+  .delete(removeFromCart);
 cartRouter.route("/apply-coupon").post(applyCoupon);
 export default cartRouter;

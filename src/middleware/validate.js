@@ -22,7 +22,7 @@ export const validate = (schema) => {
     } else {
       const errMsgs = error.details.map((err) => err.message);
 
-      next(new AppError(errMsgs, 401));
+      next(new AppError(errMsgs, 400));
     }
   };
 };

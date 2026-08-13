@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { checkEmail } from "../../middleware/checkEmail.js";
 import {
+  allowedTo,
   changeUserPassword,
+  protectedRoutes,
   signin,
   signup,
 } from "./auth.controller.js";
@@ -12,6 +14,11 @@ const authRouter = Router();
 
 authRouter.post("/signup", validate(signupValid), checkEmail, signup);
 authRouter.post("/signin", validate(signinValid), signin);
-authRouter.patch("/change-password", changeUserPassword);
+authRouter.patch(
+  "/change-password",
+  protectedRoutes,
+  allowedTo("user"),
+  changeUserPassword,
+);
 
 export default authRouter;

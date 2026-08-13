@@ -77,7 +77,7 @@ const allowedTo = (...roles) => {
     if (roles.includes(req.user.role)) return next();
 
     return next(
-      new AppError("you are not authorized to access this endpoint", 401),
+      new AppError("you are not authorized to access this endpoint", 403),
     );
   });
 };

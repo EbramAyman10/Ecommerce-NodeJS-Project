@@ -1,39 +1,19 @@
 import Cart from "../../../database/models/cart.model.js";
 import Order from "../../../database/models/order.model.js";
-import Product from "../../../database/models/product.model.js";
 import User from "../../../database/models/users.model.js";
 import catchError from "../../middleware/catchError.js";
+import { createOrderServer } from "../../service/orderService.js";
 import { AppError } from "../../utils/appError.js";
 
 import Stripe from "stripe";
 const stripeClient = new Stripe(process.env.STRIPE_KEY);
 
 const createCashOrder = catchError(async (req, res, next) => {
-  let cart = await Cart.findById(req.params.id);
-  if (!cart) return next(new AppError("cart not found", 404));
-
-  let totalOrderPrice = cart.totalCartPriceAfterDiscound || cart.totalCartPrice;
-
-  let order = new Order({
-    user: req.user._id,
-    orderItems: cart.cartItems,
-    shippingAddress: req.body.shippingAddress,
-    totalOrderPrice,
-  });
-  await order.save();
-
-  let options = cart.cartItems.map((prod) => {
-    return {
-      updateOne: {
-        filter: { _id: prod.product },
-        update: { $inc: { sold: prod.quantity, stock: -prod.quantity } },
-      },
-    };
-  });
-
-  await Product.bulkWrite(options);
-
-  await Cart.findByIdAndDelete(cart._id);
+  let order = await createOrderServer(
+    req.params.id,
+    req.user._id,
+    req.body.shippingAddress,
+  );
   res.json({ message: "Success", order });
 });
 
@@ -90,39 +70,22 @@ const createCardOrder = catchError(async (req, res, next) => {
     checkout = event.data.object;
     let user = await User.findOne({ email: checkout.customer_email });
     if (!user) return next(new AppError("user not found", 404));
-    let cart = await Cart.findById(checkout.client_reference_id);
-    if (!cart) return next(new AppError("cart not found", 404));
 
-    let order = new Order({
-      user: user._id,
-      orderItems: cart.cartItems,
-      shippingAddress: checkout.metadata,
-      totalOrderPrice: checkout.amount_total / 100,
-      paymentType: "card",
-      isPaid: true,
-    });
-    await order.save();
-
-    let options = cart.cartItems.map((prod) => {
-      return {
-        updateOne: {
-          filter: { _id: prod.product },
-          update: { $inc: { sold: prod.quantity, stock: -prod.quantity } },
-        },
-      };
-    });
-
-    await Product.bulkWrite(options);
-
-    await Cart.findByIdAndDelete(cart._id);
+    await createOrderServer(
+      checkout.client_reference_id,
+      user._id,
+      checkout.metadata,
+      "card",
+      true,
+    );
   }
   res.json({ message: "success", checkout });
 });
 
 export {
-  createCashOrder,
-  getUserOrders,
-  getAllOrders,
-  createCheckoutSession,
   createCardOrder,
+  createCashOrder,
+  createCheckoutSession,
+  getAllOrders,
+  getUserOrders,
 };

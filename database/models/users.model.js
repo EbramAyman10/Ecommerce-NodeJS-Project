@@ -3,7 +3,10 @@ import bcrypt from "bcrypt";
 const schema = new mongoose.Schema(
   {
     name: String,
-    email: String,
+    email: {
+      type: String,
+      unique: true,
+    },
     password: String,
     role: {
       type: String,
@@ -35,7 +38,8 @@ const schema = new mongoose.Schema(
 );
 
 schema.pre("save", function () {
-  this.password = bcrypt.hashSync(this.password, 8);
+  if (this.isModified("password"))
+    this.password = bcrypt.hashSync(this.password, 8);
 });
 schema.pre("findOneAndUpdate", function () {
   if (this._update.password)

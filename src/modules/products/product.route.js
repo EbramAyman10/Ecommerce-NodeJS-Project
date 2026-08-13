@@ -7,6 +7,9 @@ import {
   deleteProduct,
 } from "./product.controller.js";
 import { uploadMixOfFile } from "../../fileUpload/fileUpload.js";
+import { validate } from "../../middleware/validate.js";
+import { addProductValidation } from "./product.validation.js";
+import { allowedTo, protectedRoutes } from "../auth/auth.controller.js";
 
 const productRouter = Router();
 
@@ -14,19 +17,18 @@ productRouter
   .route("/")
   .get(getAllProducts)
   .post(
-    uploadMixOfFile(
-      [
-        { name: "imageCover", maxCount: 1 },
-        { name: "images", maxCount: 10 },
-      ],
-      "products",
-    ),
+    protectedRoutes,
+    allowedTo("admin"),
+    uploadMixOfFile([{ name: "images", maxCount: 10 }], "products"),
+    validate(addProductValidation),
     addProduct,
   );
 productRouter
   .route("/:id")
   .get(getProduct)
   .put(
+    protectedRoutes,
+    allowedTo("admin"),
     uploadMixOfFile(
       [
         { name: "imageCover", maxCount: 1 },
@@ -36,6 +38,6 @@ productRouter
     ),
     updateProduct,
   )
-  .delete(deleteProduct);
+  .delete(protectedRoutes, allowedTo("admin"), deleteProduct);
 
 export default productRouter;

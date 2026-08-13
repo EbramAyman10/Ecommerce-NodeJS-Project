@@ -16,7 +16,7 @@ const fileUpload = (folderName) => {
     if (file.mimetype.startsWith("image")) {
       cb(null, true);
     } else {
-      cb(new AppError("images only", 401), false);
+      cb(new AppError("images only", 400), false);
     }
   }
 

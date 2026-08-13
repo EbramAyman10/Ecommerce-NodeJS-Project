@@ -9,6 +9,7 @@ import { deleteOne, getAll, getOne } from "../../handlers/handlers.js";
 const addCategory = catchError(async (req, res) => {
   req.body.slug = slugify(req.body.name);
   req.body.image = req.file.filename;
+  req.body.createdBy = req.user._id;
   let category = new Category(req.body);
   await category.save();
   res.status(201).json({ message: "Success", category });
@@ -19,16 +20,7 @@ const getAllCategories = getAll(Category);
 const getCategory = getOne(Category);
 
 const updateCategory = catchError(async (req, res, next) => {
-  req.body.slug = slugify(req.body.name);
-  if (req.file) {
-    req.body.image = req.file.filename;
-    let category = await Category.findById(req.params.id);
-    let filename = category.image.split("/").pop();
-    fs.rmSync(path.join(process.cwd(), "uploads/categories", filename), {
-      force: true,
-    });
-  }
-
+  if (req.body.slug) req.body.slug = slugify(req.body.name);
   let category = await Category.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
